@@ -16,7 +16,9 @@ class Person(db.Model):
     first_name = db.StringProperty()
     last_name = db.StringProperty()
     email = db.EmailProperty()
-
+    twitter = db.StringProperty()
+    github = db.StringProperty()
+    linkedin = db.StringProperty()
 
     @classmethod
     def get_by_user(cls, user):
@@ -41,7 +43,8 @@ class MainHandler(webapp2.RequestHandler):
                 return
             else:
                 if users.is_current_user_admin():
-                    person = Person(user=user, first_name="", last_name="")
+                    person = Person()
+                    person.user = user
                     person.put()
                     logging.info('Adding person for admin user %s.' % user)
                     self.redirect('/people')
@@ -84,7 +87,45 @@ class PeopleHandler(webapp2.RequestHandler):
         template = jinja_environment.get_template('people.html')
         self.response.out.write(template.render(template_values))
 
+class MyselfHandler(webapp2.RequestHandler):
+    def get(self):
+        person = Person.get_for_current_user()
+
+        if not person:
+            self.redirect('/')
+            return
+
+        url = users.create_logout_url('/')
+        url_linktext = 'Logout'
+
+        template_values = {
+            'url': url,
+            'url_linktext': url_linktext,
+            'myself': person,
+        }
+
+        template = jinja_environment.get_template('myself.html')
+        self.response.out.write(template.render(template_values))
+
+    def post(self):
+        person = Person.get_for_current_user()
+
+        if not person:
+            self.redirect('/')
+            return
+
+        person.first_name = self.request.get('first_name')
+        person.last_name = self.request.get('last_name')
+        person.email = self.request.get('email')
+        person.twitter = self.request.get('twitter')
+        person.github = self.request.get('github')
+        person.linkedin = self.request.get('linkedin')
+        person.put()
+
+        self.redirect('/people/me')
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/people', PeopleHandler)
+    ('/people', PeopleHandler),
+    ('/people/me', MyselfHandler)
 ], debug=True)
