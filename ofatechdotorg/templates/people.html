@@ -75,24 +75,39 @@
   {% for person in people %}
   <div class="span5 well">
     <h2>{{ person.first_name }} {{ person.last_name }}</h2>
+    {% if person.address %}
+    <div class="span4">
+      <i class="icon-home icon-large"></i>&nbsp;{{ person.address }}
+    </div>
+    {% endif %}
+    {% if person.phone_number %}
+    <div class="span4">
+      <i class="icon-phone icon-large"></i>&nbsp;<a href="tel:{{ person.phone_number }}">{{ person.phone_number }}</a>
+    </div>
+    {% endif %}
     {% if person.email %}
-    <div class="span2">
+    <div class="span4">
       <i class="icon-envelope icon-large"></i>&nbsp;<a href="mailto:{{ person.email }}">{{ person.email }}</a>
     </div>
     {% endif %}
     {% if person.twitter %}
-    <div class="span2">
-      <i class="icon-twitter icon-large"></i>&nbsp;<a href="https://twitter.com/{{ person.twitter }}">@{{ person.twitter }}</a>
+    <div class="span4">
+      <i class="icon-twitter icon-large"></i>&nbsp;<a href="{{ person.twitter }}">{{ person.twitter }}</a>
     </div>
     {% endif %}
     {% if person.github %}
-    <div class="span2">
-      <i class="icon-github icon-large"></i>&nbsp;<a href="https://github.com/{{ person.github }}">{{ person.github }}</a>
+    <div class="span4">
+      <i class="icon-github icon-large"></i>&nbsp;<a href="{{ person.github }}">{{ person.github }}</a>
+    </div>
+    {% endif %}
+    {% if person.facebook %}
+    <div class="span4">
+      <i class="icon-facebook icon-large"></i>&nbsp;<a href="{{ person.facebook }}">{{ person.facebook }}</a>
     </div>
     {% endif %}
     {% if person.linkedin %}
     <div class="span4">
-      <i class="icon-linkedin icon-large"></i>&nbsp;<a href="https://linkedin.com/{{ person.linkedin }}">{{ person.linkedin }}</a>
+      <i class="icon-linkedin icon-large"></i>&nbsp;<a href="{{ person.linkedin }}">{{ person.linkedin }}</a>
     </div>
     {% endif %}
   </div>

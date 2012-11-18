@@ -14,12 +14,16 @@ jinja_environment = jinja2.Environment(
 
 class Person(db.Model):
     user = db.UserProperty()
+    updated = db.DateTimeProperty(auto_now=True)
     first_name = db.StringProperty()
     last_name = db.StringProperty()
+    phone_number = db.PhoneNumberProperty()
+    address = db.PostalAddressProperty()
     email = db.EmailProperty()
-    twitter = db.StringProperty()
-    github = db.StringProperty()
-    linkedin = db.StringProperty()
+    twitter = db.LinkProperty()
+    github = db.LinkProperty()
+    linkedin = db.LinkProperty()
+    facebook = db.LinkProperty()
 
     @classmethod
     def get_by_user(cls, user):
@@ -133,12 +137,15 @@ class MyselfHandler(webapp2.RequestHandler):
             self.redirect('/')
             return
 
-        person.first_name = self.request.get('first_name')
-        person.last_name = self.request.get('last_name')
-        person.email = self.request.get('email')
-        person.twitter = self.request.get('twitter')
-        person.github = self.request.get('github')
-        person.linkedin = self.request.get('linkedin')
+        person.first_name = self.request.get('first_name') if self.request.get('first_name') else None
+        person.last_name = self.request.get('last_name') if self.request.get('last_name') else None
+        person.address = self.request.get('address') if self.request.get('address') else None
+        person.phone_number = self.request.get('phone_number') if self.request.get('phone_number') else None
+        person.email = self.request.get('email') if self.request.get('email') else None
+        person.twitter = self.request.get('twitter') if self.request.get('twitter') else None
+        person.github = self.request.get('github') if self.request.get('github') else None
+        person.linkedin = self.request.get('linkedin') if self.request.get('linkedin') else None
+        person.facebook = self.request.get('facebook') if self.request.get('facebook') else None
         person.put()
 
         self.redirect('/people/me')

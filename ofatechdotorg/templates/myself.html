@@ -87,21 +87,39 @@
       </div>
     </div>
     <div class="control-group">
+      <label class="control-label" for="input_address">Address</label>
+      <div class="controls">
+        <input type="text" id="input_address" placeholder="1600 Pennsylvania Ave. NW, Washington, DC 20500" maxlength="512" class="input-xxlarge" value="{% if myself.address %}{{ myself.address }}{% endif %}" name="address">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="input_phone">Phone Number</label>
+      <div class="controls">
+        <input type="text" id="input_phone" placeholder="123-456-7890" maxlength="12" class="input-medium" value="{% if myself.phone_number %}{{ myself.phone_number }}{% endif %}" name="phone_number">
+      </div>
+    </div>
+    <div class="control-group">
       <label class="control-label" for="input_twitter">Twitter</label>
       <div class="controls">
-        <input type="text" id="input_twitter" placeholder="Your Twitter username" maxlength="160" class="input-medium" value="{% if myself.twitter %}{{ myself.twitter }}{% endif %}" name="twitter">
+        <input type="text" id="input_twitter" placeholder="https://twitter.com/username" maxlength="160" class="input-xlarge" value="{% if myself.twitter %}{{ myself.twitter }}{% endif %}" name="twitter">
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="input_github">GitHub</label>
       <div class="controls">
-        <input type="text" id="input_github" placeholder="Your GitHub username" maxlength="160" class="input-medium" value="{% if myself.github %}{{ myself.github }}{% endif %}" name="github">
+        <input type="text" id="input_github" placeholder="https://github.com/username" maxlength="160" class="input-xlarge" value="{% if myself.github %}{{ myself.github }}{% endif %}" name="github">
       </div>
     </div>
     <div class="control-group">
       <label class="control-label" for="input_linkedin">LinkedIn</label>
       <div class="controls">
-        <input type="text" id="input_linkedin" placeholder="Your LinkedIn profile" maxlength="160" class="input-large" value="{% if myself.linkedin %}{{ myself.linkedin }}{% endif %}" name="linkedin">
+        <input type="text" id="input_linkedin" placeholder="https://linkedin.com/in/username" maxlength="160" class="input-xlarge" value="{% if myself.linkedin %}{{ myself.linkedin }}{% endif %}" name="linkedin">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="input_facebook">Facebook</label>
+      <div class="controls">
+        <input type="text" id="input_facebook" placeholder="https://facebook.com/username" maxlength="160" class="input-xlarge" value="{% if myself.facebook %}{{ myself.facebook }}{% endif %}" name="facebook">
       </div>
     </div>
     <div class="control-group">
