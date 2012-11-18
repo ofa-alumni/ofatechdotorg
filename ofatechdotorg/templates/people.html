@@ -16,6 +16,7 @@
     <link href="/static/css/bootstrap-responsive.css" rel="stylesheet">
     <link href="/static/css/ofa-bootstrap.css" rel="stylesheet">
     <link href="/static/css/style.css" rel="stylesheet">
+    <link href="/static/css/font-awesome.css" rel="stylesheet">
      <link rel="stylesheet" type="text/css" href="/static/css/token-input.css" />
      <link rel="stylesheet" type="text/css" href="/static/css/token-input-facebook.css" />
 
@@ -74,12 +75,26 @@
   {% for person in people %}
   <div class="span5 well">
     <h2>{{ person.first_name }} {{ person.last_name }}</h2>
-    <ul>
-      {% if person.email %}<li><a href="mailto:{{ person.email }}">{{ person.email }}</a></li>{% endif %}
-      {% if person.twitter %}<li><a href="https://twitter.com/{{ person.twitter }}">@{{ person.twitter }}</a></li>{% endif %}
-      {% if person.github %}<li>GitHub <a href="https://github.com/{{ person.github }}">{{ person.github }}</a></li>{% endif %}
-      {% if person.linkedin %}<li>linkedin <a href="https://linkedin.com/{{ person.linkedin }}">{{ person.linkedin }}</a></li>{% endif %}
-    </ul>
+    {% if person.email %}
+    <div class="span2">
+      <i class="icon-envelope icon-large"></i>&nbsp;<a href="mailto:{{ person.email }}">{{ person.email }}</a>
+    </div>
+    {% endif %}
+    {% if person.twitter %}
+    <div class="span2">
+      <i class="icon-twitter icon-large"></i>&nbsp;<a href="https://twitter.com/{{ person.twitter }}">@{{ person.twitter }}</a>
+    </div>
+    {% endif %}
+    {% if person.github %}
+    <div class="span2">
+      <i class="icon-github icon-large"></i>&nbsp;<a href="https://github.com/{{ person.github }}">{{ person.github }}</a>
+    </div>
+    {% endif %}
+    {% if person.linkedin %}
+    <div class="span4">
+      <i class="icon-linkedin icon-large"></i>&nbsp;<a href="https://linkedin.com/{{ person.linkedin }}">{{ person.linkedin }}</a>
+    </div>
+    {% endif %}
   </div>
   {% endfor %}
 
