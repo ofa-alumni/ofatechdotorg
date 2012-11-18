@@ -26,7 +26,7 @@ class Person(db.Model):
 
     @classmethod
     def get_for_current_user(cls):
-        return cls.all().filter("user = ", users.get_current_user()).get()
+        return cls.get_by_user(users.get_current_user())
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
