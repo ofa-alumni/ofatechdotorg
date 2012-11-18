@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import logging
+from datetime import datetime
 
 import webapp2
 import jinja2
@@ -27,6 +28,24 @@ class Person(db.Model):
     @classmethod
     def get_for_current_user(cls):
         return cls.get_by_user(users.get_current_user())
+
+    @property
+    def invitations(self):
+        return Invitation.get_by_inviter(self.user)
+
+class Invitation(db.Model):
+    inviter = db.UserProperty()
+    email = db.EmailProperty()
+    created_at = db.DateTimeProperty(auto_now_add=True)
+    claimed_at = db.DateTimeProperty()
+
+    @classmethod
+    def get_by_email(cls, email):
+        return cls.all().filter("email = ", email).get()
+
+    @classmethod
+    def get_by_inviter(cls, user):
+        return cls.all().filter("inviter = ", user).run()
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
@@ -124,8 +143,81 @@ class MyselfHandler(webapp2.RequestHandler):
 
         self.redirect('/people/me')
 
+class InviteHandler(webapp2.RequestHandler):
+    def get(self):
+        person = Person.get_for_current_user()
+
+        if not person:
+            self.redirect('/')
+            return
+
+        url = users.create_logout_url('/')
+        url_linktext = 'Logout'
+
+        template_values = {
+            'url': url,
+            'url_linktext': url_linktext,
+            'invite_root': self.request.application_url,
+            'myself': person,
+            'invitations': person.invitations,
+        }
+
+        template = jinja_environment.get_template('invite.html')
+        self.response.out.write(template.render(template_values))
+
+    def post(self):
+        person = Person.get_for_current_user()
+
+        if not person:
+            self.redirect('/')
+            return
+
+        invited_email = self.request.get('email')
+
+        existing_invitation = Invitation.get_by_email(invited_email)
+
+        if existing_invitation:
+            logging.warn('Ignoring already-invited e-mail %s.' % invited_email)
+        else:
+            invitation = Invitation()
+            invitation.email = invited_email
+            invitation.inviter = users.get_current_user()
+            invitation.put()
+
+        self.redirect('/people/invite')
+
+class InvitedHandler(webapp2.RequestHandler):
+    def get(self):
+        invitation = Invitation.get(self.request.get('key'))
+
+        if invitation:
+            if invitation.claimed_at:
+                logging.warn('Attempt to use claimed invitation %s.' % invitation.key())
+                self.redirect('/')
+                return
+        else:
+            self.redirect('/')
+            return
+
+        user = users.get_current_user()
+        if not user:
+            self.redirect(users.create_login_url(self.request.uri))
+            return
+
+        invitation.claimed_at = datetime.utcnow()
+        invitation.put()
+
+        person = Person()
+        person.user = user
+        person.email = invitation.email
+        person.put()
+
+        self.redirect('/people/me')
+
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/people', PeopleHandler),
-    ('/people/me', MyselfHandler)
+    ('/people/me', MyselfHandler),
+    ('/people/invite', InviteHandler),
+    ('/invited', InvitedHandler)
 ], debug=True)
