@@ -8,6 +8,7 @@ import jinja2
 
 from google.appengine.api import users
 from google.appengine.ext import db
+from google.appengine.api import mail
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__) + '/templates'))
@@ -173,6 +174,7 @@ class InviteHandler(webapp2.RequestHandler):
         self.response.out.write(template.render(template_values))
 
     def post(self):
+        user = users.get_current_user()
         person = Person.get_for_current_user()
 
         if not person:
@@ -190,6 +192,23 @@ class InviteHandler(webapp2.RequestHandler):
             invitation.email = invited_email
             invitation.inviter = users.get_current_user()
             invitation.put()
+
+            if not mail.is_email_valid(invited_email):
+                logging.warn('Ignoring invalid e-mail %s.' % invited_email)
+            else:
+                message = mail.EmailMessage()
+                message.sender = user.email()
+                message.to = invited_email
+                message.subject = "You've Been Invited to OFA Tech Alumni"
+                message.body = """I've invited you to participate in the OFA Tech Alumni website!
+
+Sign up to share your contact information and make it easier to stay in contact with your fellow OFA Tech coworkers.
+
+Use this link to join:
+
+%s/invited?key=%s""" % (self.request.application_url, invitation.key())
+
+                message.send()
 
         self.redirect('/people/invite')
 
