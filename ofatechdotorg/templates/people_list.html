@@ -70,68 +70,52 @@
 
   <div class="container">
   <div class="pull-right">
-    <i class="icon-th-large"></i>
-    <a href="/people?list=1"><i class="icon-th-list"></i></a>
+  <a href="/people"><i class="icon-th-large"></i></a>
+  <i class="icon-th-list"></i>
   </div>
-  <div class="row">
-    <div class="span12">
+  <h1>People</h1>
+  <hr>
+  <table class="table table-condensed table-hover table-bordered table-striped">
 
-      <h1>People</h1>
-      <hr>
-    </div>
-  </div>
-  <div class="row">
-  {% for person in people %}
-  <div class="span5 well vcard">
-    {% if person.gravatar %}<img src="{{ person.gravatar }}" class="photo img-rounded pull-right"/>{% endif %}
-    <h2 class="fn">{{ person.first_name }} {{ person.last_name }}</h2>
-    {% if person.address %}
-    <div class="span4">
-      <i class="icon-home "></i>&nbsp;{{ person.address }}
-    </div>
-    {% endif %}
-    {% if person.phone_number %}
-    <div class="span4">
-      <i class="icon-phone "></i>&nbsp;<a href="tel:{{ person.phone_number }}" class="tel">{{ person.phone_number }}</a>
-    </div>
-    {% endif %}
-    {% if person.email %}
-    <div class="span4 ">
-      <i class="icon-envelope "></i>&nbsp;<a href="mailto:{{ person.email }}" class="email">{{ person.email }}</a>
-    </div>
-    {% endif %}
-    {% if person.twitter %}
-    <div class="span4">
-      <i class="icon-twitter "></i>&nbsp;<a target="_blank" href="http://twitter.com/{{ person.twitter }}" class="url">http://twitter.com/{{ person.twitter }}</a>
-    </div>
-    {% endif %}
-    {% if person.github %}
-    <div class="span4">
-      <i class="icon-github "></i>&nbsp;<a target="_blank"  href="https://github.com/{{ person.github }}" class="url">https://github.com/{{ person.github }}</a>
-    </div>
-    {% endif %}
-    {% if person.facebook %}
-    <div class="span4">
-      <i class="icon-facebook "></i>&nbsp;<a  target="_blank" href="https://facebook.com/{{ person.facebook }}" class="url">https://facebook.com/{{ person.facebook }}</a>
-    </div>
-    {% endif %}
-    {% if person.linkedin %}
-    <div class="span4">
-      <i class="icon-linkedin "></i>&nbsp;<a  target="_blank" href="https://linkedin.com/in/{{ person.linkedin }}" class="url">https://linkedin.com/in/{{ person.linkedin }}</a>
-    </div>
-    {% endif %}
+  <thead>
+    <tr>
+      <th></th>
+      <th>Name</th>
+      <th style="text-align: center"><i class="icon-home "></i></th>
+      <th style="text-align: center"><i class="icon-phone "></i></th>
+      <th style="text-align: center"><i class="icon-envelope "></i></th>
+      <th style="text-align: center"><i class="icon-twitter "></i></th>
+      <th style="text-align: center"><i class="icon-github "></i></th>
+      <th style="text-align: center"><i class="icon-facebook "></i></th>
+      <th style="text-align: center"><i class="icon-linkedin "></i></th>
+      <th style="text-align: center"><i class="icon-download "></i></th>
 
-    <div class="span4 muted">
-      <i class="icon-download "></i> <a href="/person/{{person.key()}}/vcard">Download vCard</a>
-    </div>
-  </div>
+    </tr>
+  </thead>
+  <tbody>
+          {% for person in people %}
+    <tr>
+    <td>{% if person.gravatar %}<img src="{{ person.gravatar }}" class="photo img-rounded pull-right"/ width="20">{% endif %}</td>
+    <td class="fn">{{ person.first_name }} {{ person.last_name }}</td>
+    <td>{% if person.address %}{{ person.address }}{% endif %}</td>
+    <td>{% if person.phone_number %}<a  target="_blank" href="tel:{{ person.phone_number }}" class="tel">{{ person.phone_number }}</a>{% endif %}</td>
+    <td>{% if person.email %}<a  target="_blank" href="mailto:{{ person.email }}" class="email">{{ person.email }}</a>{% endif %}</td>
+    <td>{% if person.twitter %}<a  target="_blank" href="http://twitter.com/{{ person.twitter }}" class="url">@{{ person.twitter }}</a>{% endif %}</td>
+    <td>{% if person.github %}<a  target="_blank" href="https://github.com/{{ person.github }}" class="url">{{ person.github }}</a>{% endif %}</td>
+    <td>{% if person.facebook %}<a  target="_blank" href="https://facebook.com/{{ person.facebook }}" class="url">{{ person.facebook }}</a>{% endif %}</td>
+    <td>{% if person.linkedin %}<a  target="_blank" href="https://linkedin.com/in/{{ person.linkedin }}" class="url">{{ person.linkedin }}</a>{% endif %}</td>
+    <td></i> <a href="/person/{{person.key()}}/vcard">vCard</a></td>
+
+    </tr>
+
   {% endfor %}
-  </div>
-  <div class="row">
-    <div class="span12">
-      <a href="/people/vcards">Download all (vcard)</a>
-    </div>
-  </div>
+  </tbody>
+
+</table>
+<a href="/people/vcards">Download all (vcard)</a>
+
+
+
   </div> <!-- /container -->
 
 

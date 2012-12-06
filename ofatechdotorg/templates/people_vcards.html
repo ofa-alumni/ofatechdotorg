@@ -1,4 +1,4 @@
-BEGIN:VCARD
+{% for person in people %}BEGIN:VCARD
 VERSION:2.1
 N:{{ person.n }}
 {% if person.phone_number %}TEL;HOME;VOICE:{{ person.phone_number }}{% endif %}
@@ -11,4 +11,4 @@ LABEL;HOME;ENCODING=QUOTED-PRINTABLE:{{ person.address }}{% endif %}
 {% if person.linkedin %}URL:https://linkedin.com/in/{{ person.linkedin }}{% endif %}
 SOURCE:http://www.ofatech.org/person/{{person.key()}}/{{person.slug}}_vcard.vcf
 REV:20080424T195243Z
-END:VCARD
+END:VCARD{% endfor %}

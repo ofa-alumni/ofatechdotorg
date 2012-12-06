@@ -2,6 +2,8 @@
 import os
 import logging
 from datetime import datetime
+from google.appengine.api import memcache
+
 
 import webapp2
 import jinja2
@@ -41,6 +43,10 @@ class Person(db.Expando):
     @classmethod
     def get_for_current_user(cls):
         return cls.get_by_user(users.get_current_user())
+
+    @classmethod
+    def get_active(cls):
+        return  cls.all().filter('active = ',True).order('last_name')
 
     @property
     def invitations(self):
@@ -108,7 +114,10 @@ class PeopleHandler(webapp2.RequestHandler):
         url = users.create_logout_url('/')
         url_linktext = 'Logout'
 
-        people = Person.all().filter('active = ',True) #.run()
+        people = memcache.get('active_people')
+        if not people:
+            people = Person.get_active()
+            memcache.set('active_people', people)
 
         template_values = {
             'url': url,
@@ -116,7 +125,49 @@ class PeopleHandler(webapp2.RequestHandler):
             'people': people,
         }
 
-        template = jinja_environment.get_template('people.html')
+        list_view =  self.request.GET.get('list', 0)
+        if list_view == "1":
+            template_file = 'people_list.html'
+        else:
+            template_file = 'people.html'
+
+
+        template = jinja_environment.get_template(template_file)
+        self.response.out.write(template.render(template_values))
+
+class PeopleVCARDHandler(webapp2.RequestHandler):
+    def get(self):
+        person = Person.get_for_current_user()
+
+        if not person:
+            self.redirect('/')
+            return
+
+        url = users.create_logout_url('/')
+        url_linktext = 'Logout'
+
+        people = memcache.get('active_people')
+        if not people:
+            people = Person.get_active()
+            memcache.set('active_people', people)
+
+        people_list = []
+        for person in people:
+            person.slug =str(slugify(person.first_name + " "+person.last_name))
+            person.n = person.last_name+";"+person.first_name
+            people_list.append(person)
+
+        template_values = {
+            'url': url,
+            'url_linktext': url_linktext,
+            'people': people_list,
+        }
+
+        template_file = 'people_vcards.html'
+
+        self.response.headers['Content-Type'] = 'text/x-vcard; charset=utf-8'
+        self.response.headers['Content-Disposition'] = 'attachment; filename="OFA_TECH_vcards.vcf'
+        template = jinja_environment.get_template(template_file)
         self.response.out.write(template.render(template_values))
 
 class PersonVCARDHandler(webapp2.RequestHandler):
@@ -133,6 +184,7 @@ class PersonVCARDHandler(webapp2.RequestHandler):
         person  = db.get(person_id)
         person.slug =str(slugify(person.first_name + " "+person.last_name))
 
+        person.n = person.last_name+";"+person.first_name
 
 
         template_values = {
@@ -194,7 +246,7 @@ class MyselfHandler(webapp2.RequestHandler):
 
         if person.first_name is not None and person.last_name is not None :
             person.active = True
-
+            memcache.delete('active_people')
         person.put()
 
         self.redirect('/people/me')
@@ -262,7 +314,16 @@ Use this link to join:
 
 class InvitedHandler(webapp2.RequestHandler):
     def get(self):
-        invitation = Invitation.get(self.request.get('key'))
+        try:
+            invitation = Invitation.get(self.request.get('key'))
+        except:
+            invitation = None
+            pass
+
+        user = users.get_current_user()
+        if not user:
+            self.redirect(users.create_login_url(self.request.uri))
+            return
 
         if invitation:
             if invitation.claimed_at:
@@ -270,13 +331,22 @@ class InvitedHandler(webapp2.RequestHandler):
                 self.redirect('/')
                 return
         else:
+            if self.request.GET.get('key',None) == '76f0aa47381d7ee6e20ec3a9b11aecab':
+
+                person = Person.get_for_current_user()
+                if not person:
+                    person = Person()
+                    person.user = user
+                    person.put()
+
+                self.redirect('/people/me')
+                return
+
+
             self.redirect('/')
             return
 
-        user = users.get_current_user()
-        if not user:
-            self.redirect(users.create_login_url(self.request.uri))
-            return
+
 
         invitation.claimed_at = datetime.utcnow()
         invitation.put()
@@ -293,6 +363,7 @@ app = webapp2.WSGIApplication([
     ('/person/(.*)/vcard', PersonVCARDHandler),
     ('/people', PeopleHandler),
     ('/people/me', MyselfHandler),
+    ('/people/vcards', PeopleVCARDHandler),
     ('/people/invite', InviteHandler),
     ('/invited', InvitedHandler)
 ], debug=True)
