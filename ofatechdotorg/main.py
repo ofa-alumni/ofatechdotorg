@@ -10,21 +10,27 @@ from google.appengine.api import users
 from google.appengine.ext import db
 from google.appengine.api import mail
 
+import urllib, hashlib
+
+
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__) + '/templates'))
 
 class Person(db.Model):
     user = db.UserProperty()
     updated = db.DateTimeProperty(auto_now=True)
+    added = db.DateTimeProperty(auto_now_add=True)
+    active = db.BooleanProperty()
     first_name = db.StringProperty()
     last_name = db.StringProperty()
     phone_number = db.PhoneNumberProperty()
     address = db.PostalAddressProperty()
     email = db.EmailProperty()
-    twitter = db.LinkProperty()
-    github = db.LinkProperty()
-    linkedin = db.LinkProperty()
-    facebook = db.LinkProperty()
+    twitter = db.StringProperty()
+    github = db.StringProperty()
+    linkedin = db.StringProperty()
+    facebook = db.StringProperty()
+    gravatar = db.LinkProperty()
 
     @classmethod
     def get_by_user(cls, user):
@@ -100,7 +106,7 @@ class PeopleHandler(webapp2.RequestHandler):
         url = users.create_logout_url('/')
         url_linktext = 'Logout'
 
-        people = Person.all().run()
+        people = Person.all().filter('active = ',True) #.run()
 
         template_values = {
             'url': url,
@@ -137,7 +143,6 @@ class MyselfHandler(webapp2.RequestHandler):
         if not person:
             self.redirect('/')
             return
-
         person.first_name = self.request.get('first_name') if self.request.get('first_name') else None
         person.last_name = self.request.get('last_name') if self.request.get('last_name') else None
         person.address = self.request.get('address') if self.request.get('address') else None
@@ -147,6 +152,19 @@ class MyselfHandler(webapp2.RequestHandler):
         person.github = self.request.get('github') if self.request.get('github') else None
         person.linkedin = self.request.get('linkedin') if self.request.get('linkedin') else None
         person.facebook = self.request.get('facebook') if self.request.get('facebook') else None
+
+
+        if person.email:
+            gravatar_url = "http://www.gravatar.com/avatar.php?"
+            gravatar_url += urllib.urlencode({'gravatar_id':hashlib.md5(person.email.lower()).hexdigest(), 'size':str(40)})
+            person.gravatar = gravatar_url
+        else:
+            person.gravatar = None
+
+
+        if person.first_name is not None and person.last_name is not None :
+            person.active = True
+
         person.put()
 
         self.redirect('/people/me')
