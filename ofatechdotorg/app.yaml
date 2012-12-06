@@ -20,3 +20,5 @@ libraries:
   version: "2.5.1"
 - name: jinja2
   version: "2.6"
+- name: django
+  version: latest

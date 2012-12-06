@@ -73,45 +73,58 @@
   <h1>People</h1>
   <hr>
   {% for person in people %}
-  <div class="span5 well">
-    <img src="{{ person.gravatar }}" class="img-rounded pull-right"/>
-    <h2>{% if person.gravatar %}{% endif %}{{ person.first_name }} {{ person.last_name }}</h2>
-    {% if person.address %}
-    <div class="span4">
-      <i class="icon-home icon-large"></i>&nbsp;{{ person.address }}
-    </div>
-    {% endif %}
-    {% if person.phone_number %}
-    <div class="span4">
-      <i class="icon-phone icon-large"></i>&nbsp;<a href="tel:{{ person.phone_number }}">{{ person.phone_number }}</a>
-    </div>
+  <div class="span5 well vcard">
+    {% if person.gravatar %}<img src="{{ person.gravatar }}" class="photo img-rounded pull-right"/>{% endif %}
+    <h2 class="fn">{{ person.first_name }} {{ person.last_name }}</h2>
+
+    <dl class="dl-horizontal">
+{% if person.address %}
+      <dt><i class="icon-home"></i></dt>
+      <dd>{{ person.address }}</dd>
+      {% endif %}
+  {% if person.phone_number %}
+
+      <dt><i class="icon-phone "></i></dt>
+      <dd><a href="tel:{{ person.phone_number }}" class="tel">{{ person.phone_number }}</a></dd>
+
     {% endif %}
     {% if person.email %}
-    <div class="span4">
-      <i class="icon-envelope icon-large"></i>&nbsp;<a href="mailto:{{ person.email }}">{{ person.email }}</a>
-    </div>
+      <dt><i class="icon-envelope"></i></dt>
+      <dd><a href="mailto:{{ person.email }}" class="email">{{ person.email }}</a></dd>
+
     {% endif %}
     {% if person.twitter %}
-    <div class="span4">
-      <i class="icon-twitter icon-large"></i>&nbsp;<a href="http://twitter.com/{{ person.twitter }}">http://twitter.com/{{ person.twitter }}</a>
-    </div>
+
+      <dt><i class="icon-twitter "></i></dt>
+      <dd><a href="http://twitter.com/{{ person.twitter }}" class="url">http://twitter.com/{{ person.twitter }}</a></dd>
+
     {% endif %}
     {% if person.github %}
-    <div class="span4">
-      <i class="icon-github icon-large"></i>&nbsp;<a href="https://github.com/{{ person.github }}">https://github.com/{{ person.github }}</a>
-    </div>
+
+      <dt><i class="icon-github "></i></dt>
+      <dd><a href="https://github.com/{{ person.github }}" class="url">https://github.com/{{ person.github }}</a></dd>
+
     {% endif %}
     {% if person.facebook %}
-    <div class="span4">
-      <i class="icon-facebook icon-large"></i>&nbsp;<a href="https://facebook.com/{{ person.facebook }}">https://facebook.com/{{ person.facebook }}</a>
-    </div>
+
+      <dt><i class="icon-facebook "></i></dt>
+      <dd><a href="https://facebook.com/{{ person.facebook }}" class="url">https://facebook.com/{{ person.facebook }}</a></dd>
+
     {% endif %}
     {% if person.linkedin %}
-    <div class="span4">
-      <i class="icon-linkedin icon-large"></i>&nbsp;<a href="https://linkedin.com/in/{{ person.linkedin }}">https://linkedin.com/in/{{ person.linkedin }}</a>
-    </div>
+
+      <dt><i class="icon-linkedin "></i></dt>
+      <dd><a href="https://linkedin.com/in/{{ person.linkedin }}" class="url">https://linkedin.com/in/{{ person.linkedin }}</a></dd>
+
     {% endif %}
+
+
+      <dt><i class="icon-download "></i></dt>
+      <dd><a href="/person/{{person.key()}}/vcard">Download vCard</a></dd>
+    </dl>
+
   </div>
+
   {% endfor %}
 
   </div> <!-- /container -->

@@ -8,15 +8,17 @@ import jinja2
 
 from google.appengine.api import users
 from google.appengine.ext import db
+
 from google.appengine.api import mail
 
 import urllib, hashlib
+from django.template.defaultfilters import slugify
 
 
 jinja_environment = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__) + '/templates'))
 
-class Person(db.Model):
+class Person(db.Expando):
     user = db.UserProperty()
     updated = db.DateTimeProperty(auto_now=True)
     added = db.DateTimeProperty(auto_now_add=True)
@@ -116,6 +118,34 @@ class PeopleHandler(webapp2.RequestHandler):
 
         template = jinja_environment.get_template('people.html')
         self.response.out.write(template.render(template_values))
+
+class PersonVCARDHandler(webapp2.RequestHandler):
+    def get(self, person_id):
+        person = Person.get_for_current_user()
+
+        if not person:
+            self.redirect('/')
+            return
+
+        url = users.create_logout_url('/')
+        url_linktext = 'Logout'
+
+        person  = db.get(person_id)
+        person.slug =str(slugify(person.first_name + " "+person.last_name))
+
+
+
+        template_values = {
+            'url': url,
+            'url_linktext': url_linktext,
+            'person': person,
+        }
+
+        template = jinja_environment.get_template('person_vcard.html')
+        self.response.headers['Content-Type'] = 'text/x-vcard; charset=utf-8'
+        self.response.headers['Content-Disposition'] = 'attachment; filename="'+person.slug+'_vcard.vcf'
+        self.response.out.write(template.render(template_values))
+
 
 class MyselfHandler(webapp2.RequestHandler):
     def get(self):
@@ -260,6 +290,7 @@ class InvitedHandler(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
+    ('/person/(.*)/vcard', PersonVCARDHandler),
     ('/people', PeopleHandler),
     ('/people/me', MyselfHandler),
     ('/people/invite', InviteHandler),

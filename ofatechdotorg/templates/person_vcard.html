@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:2.1
+FN:{{ person.first_name }} {{ person.last_name }}
+{% if person.phone_number %}TEL;HOME;VOICE:{{ person.phone_number }}{% endif %}
+{% if person.address %}ADR;HOME:;;{{ person.address }}
+LABEL;HOME;ENCODING=QUOTED-PRINTABLE:{{ person.address }}{% endif %}
+{% if person.email %}EMAIL;PREF;INTERNET:{{ person.email }}{% endif %}
+{% if person.twitter %}URL:http://twitter.com/{{ person.twitter }}{% endif %}
+{% if person.github %}URL:https://github.com/{{ person.github }}{% endif %}
+{% if person.facebook %}URL:https://facebook.com/{{ person.facebook }}{% endif %}
+{% if person.linkedin %}URL:https://linkedin.com/in/{{ person.linkedin }}{% endif %}
+SOURCE:http://www.ofatech.org/person/{{person.key()}}/{{person.slug}}_vcard.vcf
+REV:20080424T195243Z
+END:VCARD
